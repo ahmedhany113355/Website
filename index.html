@@ -81,6 +81,45 @@
       animation: float 6s ease-in infinite;
       z-index: 5;
     }
+    /* ===== تكبير الخط والأزرار على الموبايل فقط ===== */
+@media (max-width: 768px) {
+  .overlay {
+    font-size: 26px; /* كبر أو صغر الرقم ده حسب ما تحب */
+  }
+
+  .overlay h1,
+  .overlay h2,
+  .overlay label,
+  .overlay p,
+  .overlay .result,
+  .overlay #greeting {
+    font-size: 1.3em; /* يخلي الكلام أكبر شوي */
+  }
+
+  .overlay input,
+  .overlay select,
+  .overlay button {
+    font-size: 1.2em;   /* الأزرار والحقول يكبروا */
+    padding: 0.9em 1.3em; /* يخليهم أوضح للمس */
+    border-radius: 0.8em;
+  }
+
+  /* الراديو بتاع ذكر وأنثى */
+  .overlay input[type="radio"] {
+    transform: scale(1.6); /* كبره بوضوح */
+  }
+
+  /* خانات اليوم والشهر والسنة */
+  #day, #month, #year {
+    width: 4.5ch;
+    font-size: 1.2em;
+  }
+
+  /* خليك متأكد إن الأزرار كبار كفاية */
+  .overlay button {
+    min-width: 15em;
+  }
+}
     @keyframes float {
       0% { transform: translateY(100vh); opacity: 1; }
       100% { transform: translateY(-120vh); opacity: 0; }
