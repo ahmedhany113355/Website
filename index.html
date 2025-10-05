@@ -685,67 +685,89 @@
     }
 
     function calculateAge(){
-      let d = parseInt(document.getElementById("day").value);
-      let m = parseInt(document.getElementById("month").value);
-      let y = parseInt(document.getElementById("year").value);
-      let gender = document.querySelector('input[name="gender"]:checked')?.value;
+  let d = parseInt(document.getElementById("day").value);
+  let m = parseInt(document.getElementById("month").value);
+  let y = parseInt(document.getElementById("year").value);
+  let gender = document.querySelector('input[name="gender"]:checked')?.value;
 
-      if(!d || !m || !y){
-        alert(translations[currentLang].alert);
-        return;
-      }
+  if(!d || !m || !y){
+    alert(translations[currentLang].alert);
+    return;
+  }
 
-      let birthDate = new Date(y, m-1, d);
-      let now = new Date();
-      let ageMs = now - birthDate;
-      let ageDate = new Date(ageMs);
-      let years = ageDate.getUTCFullYear()-1970;
-      let months = years*12 + now.getMonth() - birthDate.getMonth();
-      let weeks = Math.floor(ageMs/(1000*60*60*24*7));
-      let days = Math.floor(ageMs/(1000*60*60*24));
-      let hours = Math.floor(ageMs/(1000*60*60));
-      let minutes = Math.floor(ageMs/(1000*60));
-      let seconds = Math.floor(ageMs/1000);
+  // إضافة التحقق من اختيار الجنس
+  if(!gender){
+    alert(currentLang === "ar" ? "من فضلك اختر الجنس أولاً 🙋‍♂️🙋‍♀️" : "Please select your gender first 🙋‍♂️🙋‍♀️");
+    return;
+  }
 
-      let nextBirthday = new Date(now.getFullYear(), m-1, d);
-      if(nextBirthday < now) nextBirthday.setFullYear(now.getFullYear()+1);
-      let diff = nextBirthday - now;
-      let leftDays = Math.floor(diff/(1000*60*60*24));
-      let leftMonths = Math.floor(leftDays/30);
-      let leftDaysExact = leftDays % 30;
+  let birthDate = new Date(y, m - 1, d);
+  let now = new Date();
 
-      document.getElementById("result").innerHTML = `
-        ${currentLang === "ar" ? 
-        `عمرك ${years} سنة و ${months%12} شهر و ${days%30} يوم<br>
-        العمر: ${years} سنة<br>
-        بالشهور: ${months}<br>
-        بالأسابيع: ${weeks}<br>
-        بالأيام: ${days}<br>
-        بالساعات: ${hours}<br>
-        بالدقائق: ${minutes}<br>
-        بالثواني: ${seconds}<br>
-        🎉 فاضل على عيد ميلادك ${leftMonths} شهر و ${leftDaysExact} يوم 🎉`
-        :
-        `Your age is ${years} years, ${months%12} months, and ${days%30} days<br>
-        Age: ${years} years<br>
-        In months: ${months}<br>
-        In weeks: ${weeks}<br>
-        In days: ${days}<br>
-        In hours: ${hours}<br>
-        In minutes: ${minutes}<br>
-        In seconds: ${seconds}<br>
-        🎉 Time left for your birthday: ${leftMonths} months and ${leftDaysExact} days 🎉`
-        }
-      `;
+  // تصحيح حساب العمر بدقة 100%
+  let years = now.getFullYear() - birthDate.getFullYear();
+  let months = now.getMonth() - birthDate.getMonth();
+  let days = now.getDate() - birthDate.getDate();
 
-      // اعرض التهنئة
-      if(gender){
-        const greetings = getRandomGreetings(gender);
-        document.getElementById("greeting").innerHTML = greetings.join("<br>");
-      }
+  if (days < 0) {
+    months--;
+    let prevMonthDays = new Date(now.getFullYear(), now.getMonth(), 0).getDate();
+    days += prevMonthDays;
+  }
 
-      celebrate();
+  if (months < 0) {
+    years--;
+    months += 12;
+  }
+
+  // حساب الفروقات الدقيقة بالميلي ثانية
+  let ageMs = now - birthDate;
+  let weeks = Math.floor(ageMs / (1000 * 60 * 60 * 24 * 7));
+  let totalDays = Math.floor(ageMs / (1000 * 60 * 60 * 24));
+  let hours = Math.floor(ageMs / (1000 * 60 * 60));
+  let minutes = Math.floor(ageMs / (1000 * 60));
+  let seconds = Math.floor(ageMs / 1000);
+
+  // حساب الأيام المتبقية لعيد الميلاد
+  let nextBirthday = new Date(now.getFullYear(), m - 1, d);
+  if (nextBirthday < now) nextBirthday.setFullYear(now.getFullYear() + 1);
+  let diff = nextBirthday - now;
+  let leftDays = Math.floor(diff / (1000 * 60 * 60 * 24));
+  let leftMonths = Math.floor(leftDays / 30);
+  let leftDaysExact = leftDays % 30;
+
+  document.getElementById("result").innerHTML = `
+    ${currentLang === "ar" ? 
+    `عمرك ${years} سنة و ${months} شهر و ${days} يوم 🎂<br>
+    العمر: ${years} سنة<br>
+    بالشهور: ${(years * 12) + months}<br>
+    بالأسابيع: ${weeks}<br>
+    بالأيام: ${totalDays}<br>
+    بالساعات: ${hours}<br>
+    بالدقائق: ${minutes}<br>
+    بالثواني: ${seconds}<br>
+    🎉 فاضل على عيد ميلادك ${leftMonths} شهر و ${leftDaysExact} يوم 🎉`
+    :
+    `Your age is ${years} years, ${months} months, and ${days} days 🎂<br>
+    Age: ${years} years<br>
+    In months: ${(years * 12) + months}<br>
+    In weeks: ${weeks}<br>
+    In days: ${totalDays}<br>
+    In hours: ${hours}<br>
+    In minutes: ${minutes}<br>
+    In seconds: ${seconds}<br>
+    🎉 Time left for your birthday: ${leftMonths} months and ${leftDaysExact} days 🎉`
     }
+  `;
+
+  // اعرض التهنئة
+  if(gender){
+    const greetings = getRandomGreetings(gender);
+    document.getElementById("greeting").innerHTML = greetings.join("<br>");
+  }
+
+  celebrate();
+}
   </script>
 </body>
 </html>
